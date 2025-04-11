@@ -16,8 +16,7 @@ Dependencies
     float alignment_factor = 0.35f;
     float cohesion_factor = 0.02f;
 ```
-
-https://github.com/user-attachments/assets/5c555544-1932-4390-80eb-cf0ed4ce7a97
+https://github.com/user-attachments/assets/baebad49-9c12-4e7b-82d6-1c6f76ae7be8
 
 ### QUICK START
 
