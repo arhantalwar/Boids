@@ -9,9 +9,9 @@
 #define WIDTH   1760
 #define HEIGHT  990
 
-#define MAX_BOIDS 200
-#define NUM_BOIDS 200
-#define MAX_SPEED 20
+#define MAX_BOIDS 100
+#define NUM_BOIDS 10
+#define MAX_SPEED 5
 
 #define BOID_RADIUS 60
 
@@ -54,22 +54,57 @@ int main() {
 
     Boid* boids_arr[MAX_BOIDS];
 
-    float avoid_factor = 0.01f;
-    float alignment_factor = 0.35f;
-    float cohesion_factor = 0.02f;
+    float separation_factor = 0.01f;
+    float alignment_factor = 0.5f;
+    float cohesion_factor = 0.009f;
 
     bool draw_dist = false;
+    bool draw_radius = false;
 
     // Generate Boids
     for(int i = 0; i < NUM_BOIDS; i++) {
-        Boid* GET_VAR(boid, i) = get_boid();
-        init_boid(GET_VAR(boid, i), boids_arr);
+        Boid* GET_VAR(b, i) = get_boid();
+        init_boid(GET_VAR(b, i), boids_arr);
     }
 
     while(!WindowShouldClose()) {
 
-        if (IsKeyPressed(KEY_R)) {
+        if (IsKeyPressed(KEY_L)) {
             draw_dist = !draw_dist;
+        }
+
+        if (IsKeyPressed(KEY_R)) {
+            draw_radius = !draw_radius;
+        }
+
+        if (IsKeyPressed(KEY_ONE)) {
+            separation_factor -= 0.01;
+            printf("[-] SEPARATION: %f\n", separation_factor);
+        }
+
+        if (IsKeyPressed(KEY_TWO)) {
+            separation_factor += 0.01;
+            printf("[+] SEPARATION: %f\n", separation_factor);
+        }
+
+        if (IsKeyPressed(KEY_THREE)) {
+            alignment_factor -= 0.01;
+            printf("[-] ALIGNMENT: %f\n", alignment_factor);
+        }
+
+        if (IsKeyPressed(KEY_FOUR)) {
+            alignment_factor += 0.01;
+            printf("[+] ALIGNMENT: %f\n", alignment_factor);
+        }
+
+        if (IsKeyPressed(KEY_FIVE)) {
+            cohesion_factor -= 0.01;
+            printf("[-] COHESION: %f\n", cohesion_factor);
+        }
+
+        if (IsKeyPressed(KEY_SIX)) {
+            cohesion_factor += 0.01;
+            printf("[+] COHESION: %f\n", cohesion_factor);
         }
 
         BeginDrawing();
@@ -88,19 +123,13 @@ int main() {
             // Drawing Boids
 
             DrawCircle(boids_arr[i]->position.x, boids_arr[i]->position.y, 7, boids_arr[i]->color);
-            /* DrawCircleLines(boids_arr[i]->position.x, boids_arr[i]->position.y, boids_arr[i]->radius, boids_arr[i]->color); */
+            if (draw_radius) {
+                DrawCircleLines(boids_arr[i]->position.x, boids_arr[i]->position.y, boids_arr[i]->radius, boids_arr[i]->color);
+            }
 
             // Implementing Rules
 
             for(int j = 0; j < boid_count; j++) {
-
-                Vector2 velocity = { boids_arr[i]->speed_x, boids_arr[i]->speed_y };
-
-                if (Vector2Length(velocity) > MAX_SPEED) {
-                    velocity = Vector2Scale(Vector2Normalize(velocity), MAX_SPEED);
-                    boids_arr[i]->speed_x = velocity.x;
-                    boids_arr[i]->speed_y = velocity.y;
-                }
 
                 if (i != j) {
                     bool in_range = CheckCollisionPointCircle(boids_arr[i]->position, boids_arr[j]->position, boids_arr[j]->radius);
@@ -108,11 +137,11 @@ int main() {
 
                         if (draw_dist) DrawLineEx(boids_arr[i]->position, boids_arr[j]->position, 1.0f, RAYWHITE);
 
-                        // RULE 1 : SEPERATION
+                        // RULE 1 : SEPARATION
                         Vector2 move = Vector2Subtract(boids_arr[i]->position, boids_arr[j]->position);
 
-                        boids_arr[i]->speed_x += move.x * avoid_factor;
-                        boids_arr[i]->speed_y += move.y * avoid_factor;
+                        boids_arr[i]->speed_x += move.x * separation_factor;
+                        boids_arr[i]->speed_y += move.y * separation_factor;
 
                         avg_speed_x += boids_arr[j]->speed_x;
                         avg_speed_y += boids_arr[j]->speed_y;
@@ -126,32 +155,40 @@ int main() {
                 }
             }
 
+            Vector2 velocity = { boids_arr[i]->speed_x, boids_arr[i]->speed_y };
+
+            if (Vector2Length(velocity) > MAX_SPEED) {
+                velocity = Vector2Scale(Vector2Normalize(velocity), MAX_SPEED);
+                boids_arr[i]->speed_x = velocity.x;
+                boids_arr[i]->speed_y = velocity.y;
+            }
+
             // RULE 2 : ALIGNMENT
             if (avg_speed_count > 0) {
-
+            
                 avg_speed_x /= avg_speed_count;
                 avg_speed_y /= avg_speed_count;
-
+            
                 boids_arr[i]->speed_x += (avg_speed_x - boids_arr[i]->speed_x) * alignment_factor;
                 boids_arr[i]->speed_y += (avg_speed_y - boids_arr[i]->speed_y) * alignment_factor;
-
+            
             }
 
 
             // RULE 3 : COHESION
             if (avg_position_count > 0) {
-
+            
                 avg_position_x /= avg_position_count;
                 avg_position_y /= avg_position_count;
-
+            
                 Vector2 direction_to_center = {
                     .x = avg_position_x - boids_arr[i]->position.x,
                     .y = avg_position_y - boids_arr[i]->position.y
                 };
-
+            
                 boids_arr[i]->speed_x += direction_to_center.x * cohesion_factor;
                 boids_arr[i]->speed_y += direction_to_center.y * cohesion_factor;
-
+            
             }
 
             // Bound check

@@ -25,3 +25,14 @@ $ gcc main.c -o main -lraylib -lm
 $ ./main
 ```
 
+### QUICK START
+
+    SHORT_CUT_KEYS              FUNCTION
+        L                       Toggle the distance between every boid within the radius
+        R                       Toggle the radius for every boid
+        1                       Decrement separation_factor
+        2                       Increment separation_factor
+        3                       Decrement alignment_factor
+        4                       Increment alignment_factor
+        5                       Decrement cohesion_factor
+        6                       Increment cohesion_factor
