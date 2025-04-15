@@ -9,11 +9,11 @@
 #define WIDTH   1760
 #define HEIGHT  990
 
-#define MAX_BOIDS 100
-#define NUM_BOIDS 10
+#define MAX_BOIDS 200
+#define NUM_BOIDS 200
 #define MAX_SPEED 5
 
-#define BOID_RADIUS 60
+#define BOID_RADIUS 50
 
 static int boid_count = 0;
 
@@ -78,32 +78,32 @@ int main() {
         }
 
         if (IsKeyPressed(KEY_ONE)) {
-            separation_factor -= 0.01;
+            separation_factor -= 0.001;
             printf("[-] SEPARATION: %f\n", separation_factor);
         }
 
         if (IsKeyPressed(KEY_TWO)) {
-            separation_factor += 0.01;
+            separation_factor += 0.001;
             printf("[+] SEPARATION: %f\n", separation_factor);
         }
 
         if (IsKeyPressed(KEY_THREE)) {
-            alignment_factor -= 0.01;
+            alignment_factor -= 0.001;
             printf("[-] ALIGNMENT: %f\n", alignment_factor);
         }
 
         if (IsKeyPressed(KEY_FOUR)) {
-            alignment_factor += 0.01;
+            alignment_factor += 0.001;
             printf("[+] ALIGNMENT: %f\n", alignment_factor);
         }
 
         if (IsKeyPressed(KEY_FIVE)) {
-            cohesion_factor -= 0.01;
+            cohesion_factor -= 0.001;
             printf("[-] COHESION: %f\n", cohesion_factor);
         }
 
         if (IsKeyPressed(KEY_SIX)) {
-            cohesion_factor += 0.01;
+            cohesion_factor += 0.001;
             printf("[+] COHESION: %f\n", cohesion_factor);
         }
 
@@ -123,6 +123,11 @@ int main() {
             // Drawing Boids
 
             DrawCircle(boids_arr[i]->position.x, boids_arr[i]->position.y, 7, boids_arr[i]->color);
+
+            Vector2 direction = Vector2Normalize((Vector2){boids_arr[i]->speed_x, boids_arr[i]->speed_y});
+            Vector2 end = Vector2Add(boids_arr[i]->position, Vector2Scale(direction, 20));
+            DrawLineEx(boids_arr[i]->position, end, 10, boids_arr[i]->color);
+
             if (draw_radius) {
                 DrawCircleLines(boids_arr[i]->position.x, boids_arr[i]->position.y, boids_arr[i]->radius, boids_arr[i]->color);
             }
